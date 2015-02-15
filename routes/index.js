@@ -15,7 +15,7 @@ router.post('/contact', function(req, res, next) {
     text: req.body.message,
     from_email: req.body.email,
     subject: ['Website contact:', req.body.subject].join(' '),
-    to: [{ email: req.app.conf.SEND_MAIL_TO }]
+    to: [{ email: req.app.conf.SEND_EMAIL_TO }]
   };
 
   mandrill_client.messages.send({

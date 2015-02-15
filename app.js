@@ -8,7 +8,7 @@ var routes = require('./routes/index');
 var app = express();
 
 app.conf = {
-  SEND_MAIL_TO: process.env.SEND_MAIL_TO,
+  SEND_EMAIL_TO: process.env.SEND_EMAIL_TO,
   MANDRILL_KEY: process.env.MANDRILL_APIKEY
 };
 
