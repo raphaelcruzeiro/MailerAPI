@@ -8,8 +8,8 @@ var routes = require('./routes/index');
 var app = express();
 
 app.conf = {
-  AWS_ACCESS_KEY: process.env.AWS_ACCESS_KEY,
-  AWS_SECRET_KEY: process.env.AWS_SECRET_KEY
+  SEND_MAIL_TO: process.env.SEND_MAIL_TO,
+  MANDRILL_KEY: process.env.MANDRILL_APIKEY
 };
 
 app.use(logger('dev'));
@@ -36,7 +36,7 @@ app.use(function(req, res, next) {
 if (app.get('env') === 'development') {
     app.use(function(err, req, res, next) {
         res.status(err.status || 500);
-        res.render('error', {
+        res.json('error', {
             message: err.message,
             error: err,
             title: 'error'
@@ -48,7 +48,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    res.render('error', {
+    res.json('error', {
         message: err.message,
         error: {},
         title: 'error'

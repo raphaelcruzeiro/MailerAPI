@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
-var nodemailer = require('nodemailer');
-var sesTransport = require('nodemailer-ses-transport');
+var mandrill = require('mandrill-api/mandrill');
 
 router.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -9,34 +8,26 @@ router.use(function(req, res, next) {
   next();
 });
 
-/* GET home page. */
-
 router.post('/contact', function(req, res, next) {
-  console.log(req.app.conf);
-  var transport = nodemailer.createTransport(sesTransport({
-    accessKeyId: req.app.conf.AWS_ACCESS_KEY,
-    secretAccessKey: req.app.conf.AWS_SECRET_KEY,
-    rateLimit: 1 // do not send more than 1 message in a second
-  }));
+  mandrill_client = new mandrill.Mandrill(req.app.conf.MANDRILL_KEY);
 
-  var mailOptions = {
-    from: "noreply@raphaelcruzeiro.com",
-    to: 'raphaelcruzeiro@raphaelcruzeiro.com', // list of receivers
-    subject: req.body.subject, // Subject line
-    text: req.body.message, // plaintext body
-    replyTo: req.body.email
+  var msg = {
+    text: req.body.message,
+    from_email: req.body.email,
+    subject: ['Website contact:', req.body.subject].join(' '),
+    to: [{ email: req.app.conf.SEND_MAIL_TO }]
   };
 
-  console.log(mailOptions);
-
-  transport.sendMail(mailOptions, function(error, response) {
-    if (error) {
-      console.error('Failed sending the email:\n' + JSON.stringify(error));
-      res.status(500).json({ status: 'failure' });
-    } else {
-      console.log('Sent email.');
-      res.json({ status: 'ok' });
-    }
+  mandrill_client.messages.send({
+    message: msg,
+    async: false,
+    ip_pool: 'Main Poo;'
+  }, function(result) {
+    console.log(result);
+    res.json({ status: 'ok' });
+  }, function(err) {
+    console.error(err);
+    res.status(500).json({ status: 'failure' });
   });
 });
 
